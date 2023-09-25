@@ -27,15 +27,23 @@ names(list_fam_ang) <- fam_names
 
 
 ##loop for finding missing species in the Flora de Brasil
-for(i in seq_along(fam_names)){
-  ##calling the species within families in POWO
-  pow_df = powoSpecies(family = fam_names[i], country = "Brazil")
-  
-  ##arranging taxa names
-  pow_df$taxon_name = str_replace(pow_df$taxon_name, " ", "_")
+for(i in 77:78){
   
   ##subseting the angiosperm df
   angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
+  
+  ###tryCatch for handling the missing families in POWO
+  tryCatch({
+    ##calling the species within families in POWO
+    pow_df = powoSpecies(family = fam_names[i], country = "Brazil")
+    return(pow_df)
+  }, error = function(e){
+    message("Absent family in POWO")
+    print(e)
+  })
+  
+  ##arranging taxa names
+  pow_df$taxon_name = str_replace(pow_df$taxon_name, " ", "_")
   
   ##POWO species absent in Flora de Brasil
   pow_abs = pow_df[-which(pow_df$taxon_name %in% angio_fam$taxon_name), ]
@@ -45,7 +53,7 @@ for(i in seq_along(fam_names)){
     print("No absent species in Flora de Brasil")
   } else{
     ##Saving automatically in the metadata folder
-   write_csv(pow_abs, file = "Data/Metadata/Angiosperms/", fam_names[i], ".csv")
+   write_csv(pow_abs, file = paste0("Data/Metadata/Angiosperms/", fam_names[i], ".csv"))
     
   ##inserting a df inside each list with the missing species in the Flora Brazil  
     list_fam_ang[[i]] = pow_abs
