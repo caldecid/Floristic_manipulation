@@ -1,7 +1,10 @@
-######IPNI search
+
+# IPNI search -------------------------------------------------------------
+
+
 devtools::install_github("barnabywalker/kewr")
 library(kewr)
-library(tidyverse)
+library(dplyr)
 library(readr)
 library(readxl)
 library(plyr)
@@ -49,16 +52,13 @@ for(i in seq_along(fam_names)){
     #arranging taxa names
     ipni_df$name = str_replace(ipni_df$name, " ", "_")
     
-    ##POWO species absent in Flora de Brasil
+    ##IPNI species absent in Flora de Brasil
     ipni_abs = ipni_df[-which(ipni_df$name %in% angio_fam$taxon_name), ]
     
     ##if else statement for not saving empty dfs
     if(dim(ipni_abs)[1] == 0){
       print("No absent species in Flora de Brasil")
     } else{
-      ##Saving automatically in the metadata folder
-      write.csv(ipni_abs, file = paste0("Data/Metadata/Angiosperms/ipni/",
-                                        fam_names[i], ".csv"))
       
       ##inserting a df inside each list with the missing species in the Flora Brazil  
       list_fam_ang[[i]] = ipni_abs
@@ -73,14 +73,50 @@ list_fam_ipni = list_fam_ang[-which(sapply(list_fam_ang, is.null))]
 ##saving list
 save(list_fam_ipni, file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.RData")
 
+##for loop for saving as xlsx each family
+for(i in seq_along(list_fam_ipni)){
+  df = list_fam_ipni[[i]] %>% select(any_of(c("family", "genus", "species",
+                                              "authors", "citationType",
+                                              "rank", "hybrid", "reference",
+                                              "publication", "publicationYear",
+                                              "referenceCollation",
+                                              "publicationId", "suppressed",
+                                              "typeLocations", "collectorTeam",
+                                              "collectionNumber", "collectionDate1",
+                                              "distribution", "locality", "id",
+                                              "fqld", "inPowo", "wfold", "bhlLink",
+                                              "publicationYearNote", "remarks",
+                                              "referenceRemarks")))
+  
+  write_xlsx(df, path = paste0("Data/Metadata/Angiosperms/ipni/",
+                               unique(list_fam_ipni[[i]]$family),
+                               ".xlsx"))                                            
+  
+}
+
+
+
 ##collapsing the list in a df
-df_ipni_families <- do.call("rbind.fill", list_fam_ipni) 
+df_ipni_families <- do.call("rbind.fill", list_fam_ipni) %>% 
+                           select(any_of(c("family", "genus", "species",
+                                         "authors", "citationType",
+                                         "rank", "hybrid", "reference",
+                                         "publication", "publicationYear",
+                                         "referenceCollation",
+                                         "publicationId", "suppressed",
+                                         "typeLocations", "collectorTeam",
+                                         "collectionNumber", "collectionDate1",
+                                         "distribution", "locality", "id",
+                                         "fqld", "inPowo", "wfold", "bhlLink",
+                                         "publicationYearNote", "remarks",
+                                         "referenceRemarks")))
 
 rownames(df_ipni_families) <- NULL
 
 
 ##writing
-write_csv(df_ipni_families, file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.csv")
+write_csv(df_ipni_families,
+          file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.csv")
 
 
 
