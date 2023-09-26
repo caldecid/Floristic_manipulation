@@ -4,7 +4,7 @@ library(kewr)
 library(tidyverse)
 library(readr)
 library(readxl)
-
+library(plyr)
 
 
 
@@ -57,7 +57,8 @@ for(i in seq_along(fam_names)){
       print("No absent species in Flora de Brasil")
     } else{
       ##Saving automatically in the metadata folder
-      write.csv(ipni_abs, file = paste0("Data/Metadata/Angiosperms/ipni/", fam_names[i], ".csv"))
+      write.csv(ipni_abs, file = paste0("Data/Metadata/Angiosperms/ipni/",
+                                        fam_names[i], ".csv"))
       
       ##inserting a df inside each list with the missing species in the Flora Brazil  
       list_fam_ang[[i]] = ipni_abs
@@ -68,18 +69,12 @@ for(i in seq_along(fam_names)){
 ###removing null elements
 list_fam_ipni = list_fam_ang[-which(sapply(list_fam_ang, is.null))]
 
-##selecting columns
-list_fam_ipni_1 <- lapply(list_fam_ipni, function(x) x %>% select(name, authors,
-                                                            family, genus, species,
-                                                            distribution,
-                                                            publicationYear,
-                                                            publicationId,
-                                                            id))
+
 ##saving list
-save(list_fam_ipni_1, file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.RData")
+save(list_fam_ipni, file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.RData")
 
 ##collapsing the list in a df
-df_ipni_families <- do.call("rbind", list_fam_ipni_1) 
+df_ipni_families <- do.call("rbind.fill", list_fam_ipni) 
 
 rownames(df_ipni_families) <- NULL
 
