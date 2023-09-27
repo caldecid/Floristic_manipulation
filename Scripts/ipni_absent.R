@@ -8,15 +8,15 @@ library(dplyr)
 library(readr)
 library(readxl)
 library(plyr)
-
+library(writexl)
 
 
 ##angiosperms, filling information, dropping NA, and creating tax_name
 
 angiosperms_bra <- read_excel("Data/Raw/Angiospermas_07 08 2023.xlsx") %>% 
-  fill(Família, Gênero) %>% 
-  drop_na(Espécie) %>% 
-  unite("taxon_name", Gênero:Espécie, sep = "_", remove = FALSE)
+              fill(Família, Gênero) %>% 
+              drop_na(Espécie) %>% 
+              unite("taxon_name", Gênero:Espécie, sep = "_", remove = FALSE)
 
 
 ##family names
@@ -113,10 +113,35 @@ df_ipni_families <- do.call("rbind.fill", list_fam_ipni) %>%
 
 rownames(df_ipni_families) <- NULL
 
+df_ipni_families$name <- str_c(df_ipni_families$genus,
+                               df_ipni_families$species, sep = "_")
+
+##eliminating duplicated species
+df_ipni_families <- df_ipni_families[-which(duplicated(df_ipni_families$name)),]
 
 ##writing
 write_csv(df_ipni_families,
           file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.csv")
+
+#########assigning source
+df_ipni_families$source <- "IPNI"
+df_powo_families$source <- "POWO"
+
+#########defining which species are in POWO but absent in IPNI
+x.powo <- df_powo_families[-which(df_powo_families$name %in%
+                                                      df_ipni_families$name), ]
+
+
+#######All species absent
+df_ipni_powo_absent <- rbind.fill(df_ipni_families, x.powo)
+
+####save 
+write_xlsx(df_ipni_powo_absent, 
+          path = "Data/Processed/Angiosperms/df_absent_sp_flora.xlsx")
+
+
+
+
 
 
 
