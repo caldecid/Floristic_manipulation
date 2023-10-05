@@ -3,13 +3,14 @@ library(tidyverse)
 devtools::install_github("DBOSlab/expowo")
 library(expowo)
 library(readxl)
+library(stringr)
 
 
 #####calling dataframes
 
 ##angiosperms, filling information, dropping NA, and creating tax_name
 
-angiosperms_bra <- read_excel("Data/Angiospermas_07 08 2023.xlsx") %>% 
+angiosperms_bra <- read_excel("Data/Raw/Angiospermas_07 08 2023.xlsx") %>% 
                   fill(Família, Gênero) %>% 
                   drop_na(Espécie) %>% 
                   unite("taxon_name", Gênero:Espécie, sep = "_", remove = FALSE)
@@ -59,5 +60,6 @@ for(i in 77:78){
     list_fam_ang[[i]] = pow_abs
   }
 }
+
 
 
