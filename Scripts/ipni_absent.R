@@ -4,7 +4,7 @@
 
 devtools::install_github("barnabywalker/kewr")
 library(kewr)
-library(dplyr)
+library(tidyverse)
 library(readr)
 library(readxl)
 library(plyr)
@@ -33,7 +33,7 @@ names(list_fam_ang) <- fam_names
 for(i in seq_along(fam_names)){
   
   ##subseting the angiosperm df
-  angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
+  #angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
   
   ###tryCatch for handling the missing families in IPNI
   tryCatch({
@@ -53,7 +53,7 @@ for(i in seq_along(fam_names)){
     ipni_df$name = str_replace(ipni_df$name, " ", "_")
     
     ##IPNI species absent in Flora de Brasil
-    ipni_abs = ipni_df[-which(ipni_df$name %in% angio_fam$taxon_name), ]
+    ipni_abs = ipni_df[-which(ipni_df$name %in% angiosperms_bra$taxon_name), ]
     
     ##if else statement for not saving empty dfs
     if(dim(ipni_abs)[1] == 0){
@@ -71,7 +71,7 @@ list_fam_ipni = list_fam_ang[-which(sapply(list_fam_ang, is.null))]
 
 
 ##saving list
-save(list_fam_ipni, file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.RData")
+save(list_fam_ipni, file = "Data/Metadata/Angiosperms/ipni_2/ipni_fam_abs_2.RData")
 
 ##for loop for saving as xlsx each family
 for(i in seq_along(list_fam_ipni)){
@@ -88,7 +88,7 @@ for(i in seq_along(list_fam_ipni)){
                                               "publicationYearNote", "remarks",
                                               "referenceRemarks")))
   
-  write_xlsx(df, path = paste0("Data/Metadata/Angiosperms/ipni/",
+  write_xlsx(df, path = paste0("Data/Metadata/Angiosperms/ipni_2/",
                                unique(list_fam_ipni[[i]]$family),
                                ".xlsx"))                                            
   
@@ -121,7 +121,7 @@ df_ipni_families <- df_ipni_families[-which(duplicated(df_ipni_families$name)),]
 
 ##writing
 write_csv(df_ipni_families,
-          file = "Data/Metadata/Angiosperms/ipni/ipni_fam_abs.csv")
+          file = "Data/Metadata/Angiosperms/ipni_2/ipni_fam_abs.csv")
 
 #########assigning source
 df_ipni_families$source <- "IPNI"
