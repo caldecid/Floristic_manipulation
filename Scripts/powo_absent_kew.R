@@ -2,9 +2,8 @@
 # POWO search -------------------------------------------------------------
 
 library(kewr)
-library(dplyr)
-library(readr)
-library(readxl)
+library(tidyverse)
+library(writexl)
 library(plyr)
 library(stringr)
 
@@ -37,9 +36,6 @@ names(list_fam_ang_powo) <- fam_names
 ##loop for finding missing species in the Flora de Brasil
 for(i in seq_along(fam_names)){
   
-  ##subseting the angiosperm df
-  angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
-  
   ###tryCatch for handling the missing families in POWO
   tryCatch({
     ##calling the species within families in POWO
@@ -58,7 +54,7 @@ for(i in seq_along(fam_names)){
   powo_df$name = str_replace(powo_df$name, " ", "_")
   
   ##POWO species absent in Flora de Brasil
-  powo_abs = powo_df[-which(powo_df$name %in% angio_fam$taxon_name), ]
+  powo_abs = powo_df[-which(powo_df$name %in% angiosperms_bra$taxon_name), ]
   
   
   ##if else statement for not saving empty dfs
