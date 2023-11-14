@@ -13,7 +13,7 @@ library(writexl)
 
 ##angiosperms, filling information, dropping NA, and creating tax_name
 
-angiosperms_bra <- read_excel("Data/Raw/Angiospermas_07 08 2023.xlsx") %>% 
+angiosperms_bra <- read_excel("Data/Raw/datasheet_angiosperms_07Nov2023.xlsx") %>% 
               fill(Família, Gênero) %>% 
               drop_na(Espécie) %>% 
               unite("taxon_name", Gênero:Espécie, sep = "_", remove = FALSE)
@@ -32,8 +32,7 @@ names(list_fam_ang) <- fam_names
 ##loop for finding missing species in the Flora de Brasil
 for(i in seq_along(fam_names)){
   
-  ##subseting the angiosperm df
-  #angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
+ 
   
   ###tryCatch for handling the missing families in IPNI
   tryCatch({
@@ -71,7 +70,9 @@ list_fam_ipni = list_fam_ang[-which(sapply(list_fam_ang, is.null))]
 
 
 ##saving list
-save(list_fam_ipni, file = "Data/Metadata/Angiosperms/ipni_2/ipni_fam_abs_2.RData")
+save(list_fam_ipni,
+     file = "Data/Metadata/Angiosperms/ipni_abs/ipni_fam_abs_2.RData")
+
 
 ##for loop for saving as xlsx each family
 for(i in seq_along(list_fam_ipni)){
@@ -86,9 +87,13 @@ for(i in seq_along(list_fam_ipni)){
                                               "distribution", "locality", "id",
                                               "fqld", "inPowo", "wfold", "bhlLink",
                                               "publicationYearNote", "remarks",
-                                              "referenceRemarks")))
+                                              "referenceRemarks"))) %>% 
+                 mutate(url = paste0("www.ipni.org/n/", list_fam_ipni[[i]]$id))
   
-  write_xlsx(df, path = paste0("Data/Metadata/Angiosperms/ipni_2/",
+  df$citationType <- "tax_nov"
+  df$source <- "ipni"
+  
+  write_xlsx(df, path = paste0("Data/Metadata/Angiosperms/ipni_abs/",
                                unique(list_fam_ipni[[i]]$family),
                                ".xlsx"))                                            
   
@@ -109,7 +114,11 @@ df_ipni_families <- do.call("rbind.fill", list_fam_ipni) %>%
                                          "distribution", "locality", "id",
                                          "fqld", "inPowo", "wfold", "bhlLink",
                                          "publicationYearNote", "remarks",
-                                         "referenceRemarks")))
+                                         "referenceRemarks")))%>% 
+  mutate(url = paste0("www.ipni.org/n/", id))
+
+df_ipni_families$citationType <- "tax_nov"
+df_ipni_families$source <- "ipni"
 
 rownames(df_ipni_families) <- NULL
 
@@ -121,27 +130,4 @@ df_ipni_families <- df_ipni_families[-which(duplicated(df_ipni_families$name)),]
 
 ##writing
 write_csv(df_ipni_families,
-          file = "Data/Metadata/Angiosperms/ipni_2/ipni_fam_abs.csv")
-
-#########assigning source
-df_ipni_families$source <- "IPNI"
-df_powo_families$source <- "POWO"
-
-#########defining which species are in POWO but absent in IPNI
-x.powo <- df_powo_families[-which(df_powo_families$name %in%
-                                                      df_ipni_families$name), ]
-
-
-#######All species absent
-df_ipni_powo_absent <- rbind.fill(df_ipni_families, x.powo)
-
-####save 
-write_xlsx(df_ipni_powo_absent, 
-          path = "Data/Processed/Angiosperms/df_absent_sp_flora.xlsx")
-
-
-
-
-
-
-
+          file = "Data/Metadata/Angiosperms/ipni_abs/ipni_fam_abs.csv")

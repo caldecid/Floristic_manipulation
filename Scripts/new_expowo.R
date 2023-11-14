@@ -28,8 +28,8 @@ for(i in seq_along(powo_fam)){
     ##implementing expowo
     tryCatch({
       ##calling the species within families and genus in POWO
-      expowo_df = powoSpecies(family = powo_fam[i],
-                                  genus = powo_genus[j],
+      expowo_df = powoSpecies(family = "Acanthaceae",
+                                  genus = c("Morsacanthus", "Thyrsacanthus"),
                                   hybrid = TRUE,
                                   synonyms = TRUE,
                                   country = "Brazil")
@@ -39,7 +39,7 @@ for(i in seq_along(powo_fam)){
       
       #POWO species absent in Flora de Brasil
       list_genus[[j]]= 
-        expowo_df[-which(expowo_df$taxon_name %in% angiosperms_bra$taxon_name), ]
+        x = expowo_df[-which(expowo_df$taxon_name %in% angiosperms_bra$taxon_name), ]
       return(list_genus[[j]])
     }, error = function(e){
       message("Absent genus in POWO")
