@@ -4,18 +4,18 @@ library(plyr)
 
 ###########expowo##########
 
-powo_fam <- unique(df_powo_families$family)
+powo_fam <- unique(angiosperms_bra$Família)
 
 ##second round
-powo_fam = powo_fam[100:142]
-list_expowo <- vector("list", length = length(powo_fam))
+powo_fam_1 = powo_fam[1:50]
+list_expowo <- vector("list", length = length(powo_fam_1))
 
-names(list_expowo) = powo_fam
+names(list_expowo) = powo_fam_1
 
 
-for(i in seq_along(powo_fam)){
+for(i in seq_along(powo_fam_1)){
   ##filtering family
-  fam_powo = df_powo_families %>% filter(family == powo_fam[i])
+  fam_powo = angiosperms_bra %>% filter(Família == powo_fam[i])
   
   ##extracting genus
   powo_genus = unique(fam_powo$genus)
@@ -29,7 +29,6 @@ for(i in seq_along(powo_fam)){
     tryCatch({
       ##calling the species within families and genus in POWO
       expowo_df = powoSpecies(family = "Acanthaceae",
-                                  genus = c("Morsacanthus", "Thyrsacanthus"),
                                   hybrid = TRUE,
                                   synonyms = TRUE,
                                   country = "Brazil")
