@@ -29,7 +29,7 @@ names(list_fam_ang) <- fam_names
 
 
 ##loop for finding missing species in the Flora de Brasil
-for(i in 200){
+for(i in 40:100){
   
   ##subseting the angiosperm df
   angio_fam = angiosperms_bra %>% filter(Família == fam_names[i])
@@ -60,7 +60,7 @@ for(i in 200){
     tryCatch({
     ##Saving automatically in the metadata folder
       write_xlsx(pow_abs, path = paste0("Data/Metadata/Angiosperms/expowo_abs/",
-                                        fam_names[i], ".csv"))
+                                        fam_names[i], ".xlsx"))
       
       ##inserting a df inside each list with the missing species in the Flora Brazil  
       list_fam_ang[[i]] = pow_abs
@@ -76,5 +76,6 @@ for(i in 200){
   }
 }
 
-
+save(list_fam_ang, 
+     file = "Data/Metadata/Angiosperms/expowo_abs/list_fam_40_100.RData")
 
