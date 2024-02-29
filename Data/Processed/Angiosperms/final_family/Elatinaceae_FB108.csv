@@ -1,0 +1,2 @@
+family,genus,species,taxon_name,authors,scientific_name,status,accepted_name,reference,hybrid,distribution,native_to_botanical_countries,introduced_to_country,introduced_to_botanical_countries,kew_id,url,source,publicationYear,citation_type
+Elatinaceae,Elatine,glaziovii,Elatine_glaziovii,Nied.,Elatine glaziovii Nied.,Accepted,NA,"H.G.A.Engler, Nat. Pflanzenfam., ed. 2. 21: 276 (1925)",FALSE,Brazil,Brazil Southeast,unknown,unknown,89510-2,http://www.plantsoftheworldonline.org/taxon/urn:lsid:ipni.org:names:89510-2,POWO,1925,taxon_novo

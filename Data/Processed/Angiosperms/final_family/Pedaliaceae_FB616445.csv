@@ -1,0 +1,2 @@
+family,genus,species,taxon_name,authors,scientific_name,status,accepted_name,reference,hybrid,distribution,native_to_botanical_countries,introduced_to_country,introduced_to_botanical_countries,kew_id,url,source,publicationYear,citation_type
+Pedaliaceae,Rogeria,brasiliensis,Rogeria_brasiliensis,J.Gay ex DC.,Rogeria brasiliensis J.Gay ex DC.,Unknown,Rogeria brasiliensis J.Gay ex DC.,Prodr. [A. P. de Candolle] 9: 257. 1845 [1 Jan 1845],FALSE,Brazil (Southern America),NA,NA,NA,77202936-1,www.ipni.org/n/77202936-1,IPNI,1845,taxon_novo
