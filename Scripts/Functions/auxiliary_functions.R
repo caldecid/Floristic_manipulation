@@ -7,7 +7,7 @@
 
 #' @description Filling the taxonomic names and filtering the accepted species in the Flora de Brasil dataset
 
-#' @param df the angiosperm dataset provided by Flora de Brasil
+#' @param df
 
 #' @returns A dataframe containing the angiosperm df with completed taxonomic names and only with accepted species
 
@@ -18,7 +18,7 @@ complete_angio_df <- function(df){
     drop_na(Espécie) %>% 
     unite("taxon_name",
           Gênero:Espécie,
-          sep = "_", remove = FALSE) %>% 
+          sep = " ", remove = FALSE) %>% 
     filter(Status == "Nome aceito")
   
   return(angiosperms_bra)
@@ -57,3 +57,399 @@ sep_fam_function <- function(df_final) {
 }
 
 
+#######Function for the First inconsistency (Hifen in Flora but not in IPNI/POWO)
+
+#' @title First inconsistency
+
+#' @description Identify species that have hifen in Flora but not in IPNI/POWO
+
+#' @param df the dataset from "complete_angio_df" 
+
+#' @returns A dataframe containing the species of the first inconsistency
+
+first_incon_function <- function(df){
+
+##identifying species with hifen in FFB
+
+##only species with hifen
+FFB_hifen = df$taxon_name[which(str_detect(df$taxon_name,
+                                                        "-"))]
+
+##filtering 
+FFB_hifen_df = df %>% filter(taxon_name %in% FFB_hifen) 
+
+##removing the hifen
+FFB_removed_hifen = str_replace(FFB_hifen_df$taxon_name, "-", "")
+
+###creating a list for each species
+
+##For POWO
+list_incom_1_powo <- vector("list", length = length(FFB_removed_hifen))
+
+names(list_incom_1_powo) = FFB_hifen
+
+##For IPNI
+list_incom_1_ipni <- vector("list", length = length(FFB_removed_hifen))
+
+names(list_incom_1_ipni) = FFB_hifen
+
+######It is better to look species by species than to download the whole family
+
+for(i in seq_along(FFB_removed_hifen)){
+  
+  list_incom_1_powo[[i]] <- tidy(search_powo(FFB_removed_hifen[i],
+                                             filters = c("species",
+                                                         "accepted")))
+  
+  list_incom_1_ipni[[i]] <- tidy(search_ipni(FFB_removed_hifen[i],
+                                             filters = c("species")))
+  
+}
+
+##POWO
+##dropping empty list
+list_incom_1_powo = list_drop_empty(list_incom_1_powo)
+##transforming in a dataset
+POWO_incom_1_FFB = do.call("rbind.fill",  list_incom_1_powo)
+##column with the names of FFB 
+POWO_incom_1_FFB$FFB_name = names(list_incom_1_powo)
+##Source
+POWO_incom_1_FFB$source = "POWO"
+
+
+
+##IPNI
+##dropping empty list
+list_incom_1_ipni = list_drop_empty(list_incom_1_ipni) 
+##transforming in a dataset
+IPNI_incom_1_FFB = do.call("rbind.fill",list_incom_1_ipni)
+
+IPNI_incom_1_FFB = distinct(IPNI_incom_1_FFB, name, .keep_all = TRUE)  %>% 
+  select(any_of(c("family", "genus", "species",
+                  "authors", "citationType",
+                  "rank", "hybrid", "reference",
+                  "publication", "publicationYear",
+                  "referenceCollation",
+                  "publicationId", "suppressed",
+                  "typeLocations", "collectorTeam",
+                  "collectionNumber", "collectionDate1",
+                  "distribution", "locality", "id",
+                  "fqld", "inPowo", "wfold", "bhlLink",
+                  "publicationYearNote", "remarks",
+                  "referenceRemarks")))%>% 
+  mutate(url = paste0("www.ipni.org/n/", id))
+
+##column with the names of FFB 
+IPNI_incom_1_FFB$FFB_name = names(list_incom_1_ipni)
+
+IPNI_incom_1_FFB$name = str_c(IPNI_incom_1_FFB$genus, IPNI_incom_1_FFB$species, sep = " ")
+##Source
+IPNI_incom_1_FFB$source <- "IPNI"
+IPNI_incom_1_FFB$citationType <- "tax_nov"
+
+##dataset representing Incompatibility 1
+first_incon_df  = rbind.fill(POWO_incom_1_FFB, IPNI_incom_1_FFB)
+
+return(first_incon_df)
+
+}
+
+
+#######Function for the Second inconsistency (Hifen in POWO/IPNI but not in Flora)
+
+#' @title Second inconsistency
+
+#' @description Identify species that have hifen in POWO/IPNI but no in the FFB
+
+#' @param df the dataset from "complete_angio_df" 
+
+#' @returns A dataframe containing the species of the second inconsistency
+
+
+
+second_incon_function <- function(df){
+  
+  ##families
+  fam_names <- unique(df$Família)
+  
+  ######creating list for keeping the missing species within each family according to IPNI
+  list_fam_IPNI <- vector("list", length = length(fam_names))
+  
+  ######creating list for keeping the missing species within each family according to POWO
+  list_fam_POWO <- vector("list", length = length(fam_names))
+  
+  ##naming
+  names(list_fam_IPNI) <- fam_names
+  
+  names(list_fam_POWO) <- fam_names
+  
+  #################IPNI########################################
+  
+  ##loop for finding the species with hifen
+  for(i in seq_along(fam_names)){
+    
+    ##calling the species within families in IPNI
+    ipni_df = tidy(search_ipni(list(family = fam_names[i],
+                                    distribution = "Brazil"),
+                               limit = 1000,
+                               filters = c("species")))
+    
+    if(dim(ipni_df)[1] == 0){
+      print("No Family in IPNI")
+      ##inserting a NULL elemetn
+      list_fam_IPNI[[i]] = NULL
+    } else{
+      ##only species with hifen
+      IPNI_hifen = ipni_df$name[which(str_detect(ipni_df$name,
+                                                 "-"))]
+      
+      ##filtering 
+      IPNI_hifen_df = ipni_df %>% filter(name %in% IPNI_hifen) 
+      
+      
+      ##if else statement for not saving empty dfs
+      if(dim(IPNI_hifen_df)[1] == 0){
+        print("No Species with hifen")
+        ##inserting a NULL element
+        list_fam_IPNI[[i]] = NULL
+      } else{
+        
+        ##adding the modified name for further comparison with Flora
+        IPNI_hifen_df$compar_name = str_replace(IPNI_hifen_df$name,
+                                                "-", "")
+        
+        ##inserting a df inside each list with the missing species in the Flora Brazil  
+        list_fam_IPNI[[i]] = IPNI_hifen_df
+      }
+     
+    }
+ }
+    
+################# POWO #############################
+  
+
+  ##loop for finding the species with hifen
+  for(i in seq_along(fam_names)){
+    
+    ##calling the species within families in POWO
+    POWO_df = tidy(search_powo(list(family = fam_names[i],
+                                    distribution = "Brazil"),
+                               limit = 1000,
+                               filters = c("species", "accepted")))
+    
+    if(dim(POWO_df)[1] == 0){
+      print("No Family in POWO")
+      ##inserting a NULL elemetn
+      list_fam_POWO[[i]] = NULL
+    } else{
+      ##only species with hifen
+      POWO_hifen = POWO_df$name[which(str_detect(POWO_df$name,
+                                                 "-"))]
+      
+      ##filtering 
+      POWO_hifen_df = POWO_df %>% filter(name %in% POWO_hifen) 
+      
+      
+      ##if else statement for not saving empty dfs
+      if(dim(POWO_hifen_df)[1] == 0){
+        print("No Species with hifen")
+        ##inserting a NULL element
+        list_fam_POWO[[i]] = NULL
+      } else{
+        
+        ##adding the modified name for further comparison with Flora
+        POWO_hifen_df$compar_name = str_replace(POWO_hifen_df$name,
+                                                "-", "")
+        
+        ##inserting a df inside each list with the missing species in the Flora Brazil  
+        list_fam_POWO[[i]] = POWO_hifen_df
+      }
+      
+    }
+  }
+  
+  ##transforming in a dataset
+  POWO_hifen = do.call("rbind.fill",  list_fam_POWO)
+  #Source
+  POWO_hifen$source = "POWO"
+  
+  IPNI_hifen = do.call("rbind.fill", list_fam_IPNI) %>% 
+    select(any_of(c("family", "genus", "species",
+                    "authors", "citationType",
+                    "rank", "hybrid", "reference",
+                    "publication", "publicationYear",
+                    "referenceCollation",
+                    "publicationId", "suppressed",
+                    "typeLocations", "collectorTeam",
+                    "collectionNumber", "collectionDate1",
+                    "distribution", "locality", "id",
+                    "fqld", "inPowo", "wfold", "bhlLink",
+                    "publicationYearNote", "remarks",
+                    "referenceRemarks", "compar_name")))%>% 
+    mutate(url = paste0("www.ipni.org/n/", id))
+  
+  #source
+  IPNI_hifen$source = "IPNI"
+  
+  #####matching the names with Flora de Brasil
+  
+  ##POWO
+  POWO_2nd = df$taxon_name[which(df$taxon_name %in% POWO_hifen$compar_name)]
+  
+  ##filtering
+  POWO_2nd_df = POWO_hifen %>% filter(compar_name %in% POWO_2nd)
+  
+  ##IPNI
+  IPNI_2nd = df$taxon_name[which(df$taxon_name %in% IPNI_hifen$compar_name)]
+  
+  ##filtering
+  IPNI_2nd_df = IPNI_hifen %>% filter(compar_name %in% IPNI_2nd) 
+  
+  ##merging
+  sec_incon_df = rbind.fill(POWO_2nd_df, IPNI_2nd_df)
+  
+  return(sec_incon_df)
+  
+}
+
+
+#######Function for the Third inconsistency
+
+#' @title Third inconsistency
+
+#' @description Identify species that have hifen in POWO/IPNI but are not present
+#' in any form in Flora
+
+#' @param df the dataset from "complete_angio_df" 
+
+#' @returns A dataframe containing the species of the third inconsistency
+
+
+third_incon_function <- function(df){
+        
+        ##families
+        fam_names <- unique(df$Família)
+        
+        ######creating list for keeping the missing species within each family according to IPNI
+        list_fam_IPNI <- vector("list", length = length(fam_names))
+        
+        ######creating list for keeping the missing species within each family according to POWO
+        list_fam_POWO <- vector("list", length = length(fam_names))
+        
+        ##naming
+        names(list_fam_IPNI) <- fam_names
+        
+        names(list_fam_POWO) <- fam_names
+        
+        #################IPNI########################################
+        
+        ##loop for finding the species with hifen
+        for(i in seq_along(fam_names)){
+          
+          ##calling the species within families in IPNI
+          ipni_df = tidy(search_ipni(list(family = fam_names[i],
+                                          distribution = "Brazil"),
+                                     limit = 1000,
+                                     filters = c("species")))
+          
+          if(dim(ipni_df)[1] == 0){
+            print("No Family in IPNI")
+            ##inserting a NULL elemetn
+            list_fam_IPNI[[i]] = NULL
+          } else{
+            
+            ##only species with hifen
+            IPNI_hifen = ipni_df$name[which(str_detect(ipni_df$name,
+                                                       "-"))]
+            
+            ##filtering 
+            IPNI_hifen_df = ipni_df %>% filter(name %in% IPNI_hifen) 
+            
+            
+            ##if else statement for not saving empty dfs
+            if(dim(IPNI_hifen_df)[1] == 0){
+              print("No Species with hifen")
+              ##inserting a NULL element
+              list_fam_IPNI[[i]] = NULL
+            } else{
+              
+              ##inserting a df inside each list with the missing species in the Flora Brazil  
+              list_fam_IPNI[[i]] = IPNI_hifen_df
+            }
+            
+          }
+        }
+        
+        ################# POWO #############################
+        
+        
+        ##loop for finding the species with hifen
+        for(i in seq_along(fam_names)){
+          
+          ##calling the species within families in POWO
+          POWO_df = tidy(search_powo(list(family = fam_names[i],
+                                          distribution = "Brazil"),
+                                     limit = 1000,
+                                     filters = c("species", "accepted")))
+          
+          if(dim(POWO_df)[1] == 0){
+            print("No Family in POWO")
+            ##inserting a NULL elemetn
+            list_fam_POWO[[i]] = NULL
+          } else{
+            ##only species with hifen
+            POWO_hifen = POWO_df$name[which(str_detect(POWO_df$name,
+                                                       "-"))]
+            
+            ##filtering 
+            POWO_hifen_df = POWO_df %>% filter(name %in% POWO_hifen) 
+            
+            
+            ##if else statement for not saving empty dfs
+            if(dim(POWO_hifen_df)[1] == 0){
+              print("No Species with hifen")
+              ##inserting a NULL element
+              list_fam_POWO[[i]] = NULL
+            } else{
+            
+              ##inserting a df inside each list with the missing species in the Flora Brazil  
+              list_fam_POWO[[i]] = POWO_hifen_df
+            }
+            
+          }
+        }
+        
+        ##transforming in a dataset
+        POWO_hifen = do.call("rbind.fill",  list_fam_POWO)
+        #Source
+        POWO_hifen$source = "POWO"
+        
+        IPNI_hifen = do.call("rbind.fill",
+                             list_fam_IPNI) %>% 
+          select(any_of(c("family", "genus", "species",
+                          "authors", "citationType",
+                          "rank", "hybrid", "reference",
+                          "publication", "publicationYear",
+                          "referenceCollation",
+                          "publicationId", "suppressed",
+                          "typeLocations", "collectorTeam",
+                          "collectionNumber", "collectionDate1",
+                          "distribution", "locality", "id",
+                          "fqld", "inPowo", "wfold", "bhlLink",
+                          "publicationYearNote", "remarks",
+                          "referenceRemarks")))%>% 
+          mutate(url = paste0("www.ipni.org/n/", id))
+        
+        #source
+        IPNI_hifen$source = "IPNI"
+  
+  ##Negative matching of names    
+  POWO_not_FFB = POWO_hifen[-which(POWO_hifen$name %in% df$taxon_name),]
+  
+  IPNI_not_FFB = IPNI_hifen[-which(IPNI_hifen$name %in% df$taxon_name),]
+        
+  ##Merging
+  third_incon_df = rbind.fill(POWO_not_FFB, IPNI_not_FFB)
+
+  return(third_incon_df)
+}
