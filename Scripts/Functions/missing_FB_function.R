@@ -23,6 +23,17 @@ missing_FFB_function <- function(df){
   ##completing dataframe information (auxiliary function)
   
   angiosperms_bra = complete_angio_df(df = df)
+  
+  ##dataset with only species with hifen
+  angiosperms_hifen =
+         angiosperms_bra[which(str_detect(angiosperms_bra$taxon_name,
+                                               "-")), ]
+  ##removing hifen
+  angiosperms_hifen$taxon_name =  str_replace(angiosperms_hifen$taxon_name, 
+                                                                       "-", "")
+  ## joining datasets 
+  angiosperms_bra <- rbind(angiosperms_bra, angiosperms_hifen)
+  
   ##family names
   fam_names <- unique(angiosperms_bra$Família)
   
@@ -55,12 +66,10 @@ missing_FFB_function <- function(df){
       print(e)
     })
     
-    #arranging taxa names
-    ipni_df$name = str_replace(ipni_df$name, " ", "_")
-    
     ##IPNI species absent in Flora de Brasil
     ipni_abs = ipni_df[-which(ipni_df$name %in% angiosperms_bra$taxon_name), ]
     
+   
     ##if else statement for not saving empty dfs
     if(dim(ipni_abs)[1] == 0){
       print("No absent species in Flora de Brasil")
@@ -76,7 +85,7 @@ missing_FFB_function <- function(df){
 
 #####collapsing the list in a df
   df_ipni_families <- do.call("rbind.fill", list_fam_IPNI) %>% 
-    select(any_of(c("family", "genus", "species",
+    select(any_of(c("name", "family", "genus", "species",
                     "authors", "citationType",
                     "rank", "hybrid", "reference",
                     "publication", "publicationYear",
@@ -94,10 +103,7 @@ missing_FFB_function <- function(df){
   df_ipni_families$source <- "IPNI"
   
   rownames(df_ipni_families) <- NULL
-  ##generating species names for further merging
-  df_ipni_families$name <- str_c(df_ipni_families$genus,
-                                 df_ipni_families$species, sep = "_")
-  
+
   ##eliminating duplicated species
   df_ipni_families <- df_ipni_families[-which(duplicated(df_ipni_families$name)),]
   
@@ -118,20 +124,19 @@ missing_FFB_function <- function(df){
       print(e)
     })
     
-    #arranging taxa names
-    powo_df$name = str_replace(powo_df$name, " ", "_")
     
     ##POWO species absent in Flora de Brasil
     powo_abs = powo_df[-which(powo_df$name %in% angiosperms_bra$taxon_name), ]
-    
     
     ##if else statement for not saving empty dfs
     if(dim(powo_abs)[1] == 0){
       print("No absent species in Flora de Brasil")
     } else{
-      powo_abs[,c('genus', 'species')] = str_split_fixed(powo_abs$name, '_', 2) 
+      powo_abs[,c('genus', 'species')] = str_split_fixed(powo_abs$name, ' ', 2) 
       
-      powo_abs = powo_abs %>% relocate(family, genus, species, author)
+      powo_abs = dplyr::rename(powo_abs, "authors" = "author")
+      
+      powo_abs = powo_abs %>% relocate(name, family, genus, species, authors)
       ##inserting a df inside each list with the missing species in the 
       list_fam_POWO[[i]] = powo_abs
   

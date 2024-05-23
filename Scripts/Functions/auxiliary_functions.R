@@ -453,3 +453,127 @@ third_incon_function <- function(df){
 
   return(third_incon_df)
 }
+
+
+
+# Function for finding the publication year of sp -------------------------
+
+#' @title Function for finding the publication year of species
+
+#' @description This function obtains the brazilian species present in FB and POWO and IPNI repositories
+
+#' @param df A dataframe containing the latest version of Flora de Brasil species. In can be with a subset of families
+
+#' @returns A dataframe containing the species in Flora de Brasil and present in POWO and IPNI
+
+present_FB <- function(df){
+  
+  
+  ##completing dataframe information (auxiliary function)
+  species_bra = complete_angio_df(df = df)
+  
+  ##family names
+  fam_names <- unique(species_bra$Família)
+  
+  ######creating list for keeping the missing species within each family according to IPNI
+  list_fam_IPNI <- vector("list", length = length(fam_names))
+  
+  ######creating list for keeping the missing species within each family according to POWO
+  list_fam_POWO <- vector("list", length = length(fam_names))
+  
+  ##naming
+  names(list_fam_IPNI) <- fam_names
+  
+  names(list_fam_POWO) <- fam_names
+  
+  
+  
+  ###################IPNI######################################
+  
+  ##loop for finding missing species in the Flora de Brasil
+  for(i in seq_along(fam_names)){
+    
+    tryCatch({
+      ##calling the species within families in IPNI
+      ipni_df = tidy(search_ipni(list(family = fam_names[i],
+                                      distribution = "Brazil"),
+                                 limit = 1000,
+                                 filters = c("species")))
+      list_fam_IPNI[[i]] = ipni_df
+    }, error = function(e){
+      message("Absent family in IPNI")
+      print(e)
+    })
+  }
+  
+  ###removing 0 elements
+  list_fam_IPNI = list_fam_IPNI[lengths(list_fam_IPNI) > 0L]
+  
+  #####collapsing the list in a df
+  df_ipni_families <- do.call("rbind.fill", list_fam_IPNI) %>% 
+    select(any_of(c("family", "genus", "species",
+                    "authors", "citationType",
+                    "rank", "hybrid", "reference",
+                    "publication", "publicationYear",
+                    "referenceCollation",
+                    "publicationId", "suppressed",
+                    "typeLocations", "collectorTeam",
+                    "collectionNumber", "collectionDate1",
+                    "distribution", "locality", "id",
+                    "fqld", "inPowo", "wfold", "bhlLink",
+                    "publicationYearNote", "remarks",
+                    "referenceRemarks")))%>% 
+    mutate(url = paste0("www.ipni.org/n/", id))
+  ##working with the columns
+  df_ipni_families$citationType <- "tax_nov"
+  df_ipni_families$source <- "IPNI"
+  
+  rownames(df_ipni_families) <- NULL
+  ##generating species names for further merging
+  df_ipni_families$name <- str_c(df_ipni_families$genus,
+                                 df_ipni_families$species, sep = "_")
+  
+  
+  #############POWO#############################
+  
+  ##loop for finding species 
+  for(i in seq_along(fam_names)){
+    
+    ###tryCatch for handling the missing families in POWO
+    tryCatch({
+      ##calling the species within families in POWO
+      powo_df = tidy(search_powo(list(family = fam_names[i],
+                                      distribution = "Brazil"),
+                                 limit = 1000,
+                                 filters = c("species", "accepted")))
+      #arranging taxa names
+      powo_df$name = str_replace(powo_df$name, " ", "_")
+      
+      list_fam_POWO[[i]] = powo_df
+    }, error = function(e){
+      message("Absent family in POWO")
+      print(e)
+    })
+    
+    
+  }
+  
+  ###removing 0 elements
+  list_fam_POWO = list_fam_POWO[lengths(list_fam_POWO) > 0L]
+  
+  ##collapsing the list in a df
+  df_powo_families <- do.call("rbind.fill", list_fam_POWO) 
+  
+  rownames(df_powo_families) <- NULL
+  
+  ##Source
+  df_powo_families$source <- "POWO"
+  
+  ##merging dataframes, not repeating species from both repositories
+  df_total <- rbind.fill(df_ipni_families,
+                         df_powo_families[!df_powo_families$name %in% df_ipni_families$name,])
+  
+  return(df_total)
+  
+  
+}

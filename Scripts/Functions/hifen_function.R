@@ -7,8 +7,8 @@
 #' @param df the angiosperm dataset provided by Flora de Brasil
 
 #' @returns A list with three dataframes:
-#'  1) Incompatibility 1: hifen in Flora de Brasil but no hifen in' Powo/IPNI; 
-#' 2) Incompatibility 2: hifen in POWO/IPNI but no hifen in Flor de Brasil; 
+#'  1) Incompatibility 1: hifen in Flora de Brasil but no hifen in Powo/IPNI; 
+#' 2) Incompatibility 2: hifen in POWO/IPNI but no hifen in Flora de Brasil; 
 #' 3) Species with hifen in POWO/IPNI but not present in Flora de Brasil
 
 
