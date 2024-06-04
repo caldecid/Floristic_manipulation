@@ -70,6 +70,15 @@ missing_FFB_function <- function(df){
     ##IPNI species absent in Flora de Brasil
     ipni_abs = ipni_df[-which(ipni_df$name %in% plants_bra$taxon_name), ]
     
+    ##looking and removing for hifens
+    ipni_abs$hifen_name = stringr::str_replace(ipni_abs$name, 
+                                               "-", "")
+    
+    ##IPNI species with hifen absent in FB
+    ipni_abs <- ipni_abs[-which(ipni_abs$hifen_name %in% plants_bra$taxon_name), ]
+    
+    ##removing column
+    ipni_abs <- ipni_abs %>% dplyr::select(-hifen_name)
    
     ##if else statement for not saving empty dfs
     if(dim(ipni_abs)[1] == 0){
@@ -128,6 +137,16 @@ missing_FFB_function <- function(df){
     
     ##POWO species absent in Flora de Brasil
     powo_abs = powo_df[-which(powo_df$name %in% plants_bra$taxon_name), ]
+    
+    ##looking and removing for hifens
+    powo_abs$hifen_name = stringr::str_replace(powo_abs$name, 
+                                               "-", "")
+    
+    ##powo species with hifen absent in FB
+    powo_abs <- powo_abs[-which(powo_abs$hifen_name %in% plants_bra$taxon_name), ]
+    
+    ##removing column
+    powo_abs <- powo_abs %>% dplyr::select(-hifen_name)
     
     ##if else statement for not saving empty dfs
     if(dim(powo_abs)[1] == 0){
