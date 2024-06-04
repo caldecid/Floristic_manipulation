@@ -10,18 +10,19 @@
 #' @param df
 
 #' @returns A dataframe containing the angiosperm df with completed taxonomic names and only with accepted species
+#' 
+#' @import tidyverse
 
 
-complete_angio_df <- function(df){
+complete_df <- function(df){
   
-  angiosperms_bra <- df %>% fill(Família, Gênero) %>% 
-    drop_na(Espécie) %>% 
+  plants_bra <- df %>% fill(Family, Genus) %>% 
+    drop_na(Species) %>% 
     unite("taxon_name",
-          Gênero:Espécie,
-          sep = " ", remove = FALSE) %>% 
-    filter(Status == "Nome aceito")
+          Genus:Species,
+          sep = " ", remove = FALSE)
   
-  return(angiosperms_bra)
+  return(plants_bra)
 }
 
 
@@ -49,7 +50,7 @@ sep_fam_function <- function(df_final) {
   list_final <- vector(mode = "list", length = fam_num)
   
   for(i in 1:fam_num){
-    list_final[[i]] <- df_final %>% filter(family == fam_names[i])
+    list_final[[i]] <- df_final %>% dplyr::filter(family == fam_names[i])
   }
   
   return(list_final)
@@ -76,10 +77,10 @@ FFB_hifen = df$taxon_name[which(str_detect(df$taxon_name,
                                                         "-"))]
 
 ##filtering 
-FFB_hifen_df = df %>% filter(taxon_name %in% FFB_hifen) 
+FFB_hifen_df = df %>% dplyr::filter(taxon_name %in% FFB_hifen) 
 
 ##removing the hifen
-FFB_removed_hifen = str_replace(FFB_hifen_df$taxon_name, "-", "")
+FFB_removed_hifen = stringr::str_replace(FFB_hifen_df$taxon_name, "-", "")
 
 ###creating a list for each species
 
@@ -97,18 +98,18 @@ names(list_incom_1_ipni) = FFB_hifen
 
 for(i in seq_along(FFB_removed_hifen)){
   
-  list_incom_1_powo[[i]] <- tidy(search_powo(FFB_removed_hifen[i],
+  list_incom_1_powo[[i]] <- tidy(kewr::search_powo(FFB_removed_hifen[i],
                                              filters = c("species",
                                                          "accepted")))
   
-  list_incom_1_ipni[[i]] <- tidy(search_ipni(FFB_removed_hifen[i],
+  list_incom_1_ipni[[i]] <- tidy(kewr::search_ipni(FFB_removed_hifen[i],
                                              filters = c("species")))
   
 }
 
 ##POWO
 ##dropping empty list
-list_incom_1_powo = list_drop_empty(list_incom_1_powo)
+list_incom_1_powo = vctrs::list_drop_empty(list_incom_1_powo)
 ##transforming in a dataset
 POWO_incom_1_FFB = do.call("rbind.fill",  list_incom_1_powo)
 ##column with the names of FFB 
@@ -120,12 +121,12 @@ POWO_incom_1_FFB$source = "POWO"
 
 ##IPNI
 ##dropping empty list
-list_incom_1_ipni = list_drop_empty(list_incom_1_ipni) 
+list_incom_1_ipni = vctr::list_drop_empty(list_incom_1_ipni) 
 ##transforming in a dataset
 IPNI_incom_1_FFB = do.call("rbind.fill",list_incom_1_ipni)
 
-IPNI_incom_1_FFB = distinct(IPNI_incom_1_FFB, name, .keep_all = TRUE)  %>% 
-  select(any_of(c("family", "genus", "species",
+IPNI_incom_1_FFB = dplyr::distinct(IPNI_incom_1_FFB, name, .keep_all = TRUE)%>% 
+  dplyr::select(tidyselect::any_of(c("family", "genus", "species",
                   "authors", "citationType",
                   "rank", "hybrid", "reference",
                   "publication", "publicationYear",
@@ -137,18 +138,19 @@ IPNI_incom_1_FFB = distinct(IPNI_incom_1_FFB, name, .keep_all = TRUE)  %>%
                   "fqld", "inPowo", "wfold", "bhlLink",
                   "publicationYearNote", "remarks",
                   "referenceRemarks")))%>% 
-  mutate(url = paste0("www.ipni.org/n/", id))
+  dplyr::mutate(url = paste0("www.ipni.org/n/", id))
 
 ##column with the names of FFB 
 IPNI_incom_1_FFB$FFB_name = names(list_incom_1_ipni)
 
-IPNI_incom_1_FFB$name = str_c(IPNI_incom_1_FFB$genus, IPNI_incom_1_FFB$species, sep = " ")
+IPNI_incom_1_FFB$name = stringr::str_c(IPNI_incom_1_FFB$genus, 
+                                       IPNI_incom_1_FFB$species, sep = " ")
 ##Source
 IPNI_incom_1_FFB$source <- "IPNI"
 IPNI_incom_1_FFB$citationType <- "tax_nov"
 
 ##dataset representing Incompatibility 1
-first_incon_df  = rbind.fill(POWO_incom_1_FFB, IPNI_incom_1_FFB)
+first_incon_df  = plyr::rbind.fill(POWO_incom_1_FFB, IPNI_incom_1_FFB)
 
 return(first_incon_df)
 
@@ -189,7 +191,7 @@ second_incon_function <- function(df){
   for(i in seq_along(fam_names)){
     
     ##calling the species within families in IPNI
-    ipni_df = tidy(search_ipni(list(family = fam_names[i],
+    ipni_df = tidy(kewr::search_ipni(list(family = fam_names[i],
                                     distribution = "Brazil"),
                                limit = 1000,
                                filters = c("species")))
@@ -204,7 +206,7 @@ second_incon_function <- function(df){
                                                  "-"))]
       
       ##filtering 
-      IPNI_hifen_df = ipni_df %>% filter(name %in% IPNI_hifen) 
+      IPNI_hifen_df = ipni_df %>% dplyr::filter(name %in% IPNI_hifen) 
       
       
       ##if else statement for not saving empty dfs
@@ -215,7 +217,7 @@ second_incon_function <- function(df){
       } else{
         
         ##adding the modified name for further comparison with Flora
-        IPNI_hifen_df$compar_name = str_replace(IPNI_hifen_df$name,
+        IPNI_hifen_df$compar_name = stringr::str_replace(IPNI_hifen_df$name,
                                                 "-", "")
         
         ##inserting a df inside each list with the missing species in the Flora Brazil  
@@ -232,7 +234,7 @@ second_incon_function <- function(df){
   for(i in seq_along(fam_names)){
     
     ##calling the species within families in POWO
-    POWO_df = tidy(search_powo(list(family = fam_names[i],
+    POWO_df = tidy(kewr::search_powo(list(family = fam_names[i],
                                     distribution = "Brazil"),
                                limit = 1000,
                                filters = c("species", "accepted")))
@@ -243,11 +245,11 @@ second_incon_function <- function(df){
       list_fam_POWO[[i]] = NULL
     } else{
       ##only species with hifen
-      POWO_hifen = POWO_df$name[which(str_detect(POWO_df$name,
+      POWO_hifen = POWO_df$name[which(stringr::str_detect(POWO_df$name,
                                                  "-"))]
       
       ##filtering 
-      POWO_hifen_df = POWO_df %>% filter(name %in% POWO_hifen) 
+      POWO_hifen_df = POWO_df %>% dplyr::filter(name %in% POWO_hifen) 
       
       
       ##if else statement for not saving empty dfs
@@ -258,7 +260,7 @@ second_incon_function <- function(df){
       } else{
         
         ##adding the modified name for further comparison with Flora
-        POWO_hifen_df$compar_name = str_replace(POWO_hifen_df$name,
+        POWO_hifen_df$compar_name = stringr::str_replace(POWO_hifen_df$name,
                                                 "-", "")
         
         ##inserting a df inside each list with the missing species in the Flora Brazil  
@@ -274,7 +276,7 @@ second_incon_function <- function(df){
   POWO_hifen$source = "POWO"
   
   IPNI_hifen = do.call("rbind.fill", list_fam_IPNI) %>% 
-    select(any_of(c("family", "genus", "species",
+           dplyr::select(any_of(c("family", "genus", "species",
                     "authors", "citationType",
                     "rank", "hybrid", "reference",
                     "publication", "publicationYear",
@@ -286,7 +288,7 @@ second_incon_function <- function(df){
                     "fqld", "inPowo", "wfold", "bhlLink",
                     "publicationYearNote", "remarks",
                     "referenceRemarks", "compar_name")))%>% 
-    mutate(url = paste0("www.ipni.org/n/", id))
+    dplyr::mutate(url = paste0("www.ipni.org/n/", id))
   
   #source
   IPNI_hifen$source = "IPNI"
@@ -297,16 +299,16 @@ second_incon_function <- function(df){
   POWO_2nd = df$taxon_name[which(df$taxon_name %in% POWO_hifen$compar_name)]
   
   ##filtering
-  POWO_2nd_df = POWO_hifen %>% filter(compar_name %in% POWO_2nd)
+  POWO_2nd_df = POWO_hifen %>% dplyr::filter(compar_name %in% POWO_2nd)
   
   ##IPNI
   IPNI_2nd = df$taxon_name[which(df$taxon_name %in% IPNI_hifen$compar_name)]
   
   ##filtering
-  IPNI_2nd_df = IPNI_hifen %>% filter(compar_name %in% IPNI_2nd) 
+  IPNI_2nd_df = IPNI_hifen %>% dplyr::filter(compar_name %in% IPNI_2nd) 
   
   ##merging
-  sec_incon_df = rbind.fill(POWO_2nd_df, IPNI_2nd_df)
+  sec_incon_df = plyr::rbind.fill(POWO_2nd_df, IPNI_2nd_df)
   
   return(sec_incon_df)
   
@@ -347,7 +349,7 @@ third_incon_function <- function(df){
         for(i in seq_along(fam_names)){
           
           ##calling the species within families in IPNI
-          ipni_df = tidy(search_ipni(list(family = fam_names[i],
+          ipni_df = tidy(kewr::search_ipni(list(family = fam_names[i],
                                           distribution = "Brazil"),
                                      limit = 1000,
                                      filters = c("species")))
@@ -359,11 +361,11 @@ third_incon_function <- function(df){
           } else{
             
             ##only species with hifen
-            IPNI_hifen = ipni_df$name[which(str_detect(ipni_df$name,
+            IPNI_hifen = ipni_df$name[which(stringr::str_detect(ipni_df$name,
                                                        "-"))]
             
             ##filtering 
-            IPNI_hifen_df = ipni_df %>% filter(name %in% IPNI_hifen) 
+            IPNI_hifen_df = ipni_df %>% dplyr::filter(name %in% IPNI_hifen) 
             
             
             ##if else statement for not saving empty dfs
@@ -387,7 +389,7 @@ third_incon_function <- function(df){
         for(i in seq_along(fam_names)){
           
           ##calling the species within families in POWO
-          POWO_df = tidy(search_powo(list(family = fam_names[i],
+          POWO_df = tidy(kewr::search_powo(list(family = fam_names[i],
                                           distribution = "Brazil"),
                                      limit = 1000,
                                      filters = c("species", "accepted")))
@@ -402,7 +404,7 @@ third_incon_function <- function(df){
                                                        "-"))]
             
             ##filtering 
-            POWO_hifen_df = POWO_df %>% filter(name %in% POWO_hifen) 
+            POWO_hifen_df = POWO_df %>% dplyr::filter(name %in% POWO_hifen) 
             
             
             ##if else statement for not saving empty dfs
@@ -426,7 +428,7 @@ third_incon_function <- function(df){
         
         IPNI_hifen = do.call("rbind.fill",
                              list_fam_IPNI) %>% 
-          select(any_of(c("family", "genus", "species",
+          dplyr::select(tidyselect::any_of(c("family", "genus", "species",
                           "authors", "citationType",
                           "rank", "hybrid", "reference",
                           "publication", "publicationYear",
@@ -438,7 +440,7 @@ third_incon_function <- function(df){
                           "fqld", "inPowo", "wfold", "bhlLink",
                           "publicationYearNote", "remarks",
                           "referenceRemarks")))%>% 
-          mutate(url = paste0("www.ipni.org/n/", id))
+          dplyr::mutate(url = paste0("www.ipni.org/n/", id))
         
         #source
         IPNI_hifen$source = "IPNI"
@@ -449,7 +451,7 @@ third_incon_function <- function(df){
   IPNI_not_FFB = IPNI_hifen[-which(IPNI_hifen$name %in% df$taxon_name),]
         
   ##Merging
-  third_incon_df = rbind.fill(POWO_not_FFB, IPNI_not_FFB)
+  third_incon_df = plyr::rbind.fill(POWO_not_FFB, IPNI_not_FFB)
 
   return(third_incon_df)
 }
@@ -470,7 +472,7 @@ present_FB <- function(df){
   
   
   ##completing dataframe information (auxiliary function)
-  species_bra = complete_angio_df(df = df)
+  species_bra = complete_df(df = df)
   
   ##family names
   fam_names <- unique(species_bra$Família)
@@ -495,7 +497,7 @@ present_FB <- function(df){
     
     tryCatch({
       ##calling the species within families in IPNI
-      ipni_df = tidy(search_ipni(list(family = fam_names[i],
+      ipni_df = tidy(kewr::search_ipni(list(family = fam_names[i],
                                       distribution = "Brazil"),
                                  limit = 1000,
                                  filters = c("species")))
@@ -511,7 +513,7 @@ present_FB <- function(df){
   
   #####collapsing the list in a df
   df_ipni_families <- do.call("rbind.fill", list_fam_IPNI) %>% 
-    select(any_of(c("family", "genus", "species",
+    dplyr::select(tidyselect::any_of(c("family", "genus", "species",
                     "authors", "citationType",
                     "rank", "hybrid", "reference",
                     "publication", "publicationYear",
@@ -523,14 +525,14 @@ present_FB <- function(df){
                     "fqld", "inPowo", "wfold", "bhlLink",
                     "publicationYearNote", "remarks",
                     "referenceRemarks")))%>% 
-    mutate(url = paste0("www.ipni.org/n/", id))
+    dplyr::mutate(url = paste0("www.ipni.org/n/", id))
   ##working with the columns
   df_ipni_families$citationType <- "tax_nov"
   df_ipni_families$source <- "IPNI"
   
   rownames(df_ipni_families) <- NULL
   ##generating species names for further merging
-  df_ipni_families$name <- str_c(df_ipni_families$genus,
+  df_ipni_families$name <- stringr::str_c(df_ipni_families$genus,
                                  df_ipni_families$species, sep = "_")
   
   
@@ -542,12 +544,12 @@ present_FB <- function(df){
     ###tryCatch for handling the missing families in POWO
     tryCatch({
       ##calling the species within families in POWO
-      powo_df = tidy(search_powo(list(family = fam_names[i],
+      powo_df = tidy(kewr::search_powo(list(family = fam_names[i],
                                       distribution = "Brazil"),
                                  limit = 1000,
                                  filters = c("species", "accepted")))
       #arranging taxa names
-      powo_df$name = str_replace(powo_df$name, " ", "_")
+      powo_df$name = stringr::str_replace(powo_df$name, " ", "_")
       
       list_fam_POWO[[i]] = powo_df
     }, error = function(e){
@@ -570,8 +572,8 @@ present_FB <- function(df){
   df_powo_families$source <- "POWO"
   
   ##merging dataframes, not repeating species from both repositories
-  df_total <- rbind.fill(df_ipni_families,
-                         df_powo_families[!df_powo_families$name %in% df_ipni_families$name,])
+  df_total <- plyr::rbind.fill(df_ipni_families,
+         df_powo_families[!df_powo_families$name %in% df_ipni_families$name,])
   
   return(df_total)
   

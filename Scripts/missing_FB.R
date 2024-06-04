@@ -12,7 +12,7 @@ library(writexl)
 
 
 ##calling dataset
-angio <- read_excel("Data/Raw/datasheet_angiosperms.xlsx")
+angio <- read_excel("Data/Raw/datasheet_angiosperms_en.xlsx")
 
 ##running function of missing species in Flora de Brasil
 x1 <- missing_FFB_function(df = angio)
@@ -27,8 +27,8 @@ family_x <- sort(unique(x1$family))
 list_abs <- vector("list", length = length(family_x))
 
 ##recovering ID
-angio_id <- angio %>% select(ID, Família) %>% drop_na %>%
-                    filter(Família %in% family_x)
+angio_id <- angio %>% select(ID, Family) %>% drop_na %>%
+                    filter(Family %in% family_x)
 
 ##for loop for generating the list and the csv file for each family 
 for(i in seq_along(family_x)){
@@ -38,6 +38,6 @@ for(i in seq_along(family_x)){
   write_csv(list_abs[[i]],
   file =paste0("Data/Processed/Angiosperms/final_family_2/",
                      family_x[i], "_FB",
-                 angio_absent$ID[i], ".csv"))
+                 angio_id$ID[i], ".csv"))
 }
 
