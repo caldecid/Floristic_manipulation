@@ -15,7 +15,28 @@
 
 
 complete_df <- function(df){
-  
+  ##checking and changing if column names are in portuguese
+  if(colnames(df)[11] == "Espécie"){
+    colnames(df) <- c("ID", "Rank", "Group",   "Class", "Division",
+                      "Order", "Family", "Subfamily", "Tribe", "Genus",
+                      "Species", "Subspecies", "Variety", "Form", "Author",
+                      "Registry", "Status",    "Qualifier", "Original work",
+                      "Origin",                   
+                      "Endemic",                   "Occurs in Brazil",         
+                      "Vouchers"  ,                "Reference"  ,              
+                      "Life Form"    ,             "Substrate"  ,              
+                      "Plant hosts",               "Animals hosts",            
+                      "Region Distribution",       "State",                    
+                      "Hydrographic Distribution", "Environment",              
+                      "Phytogeographic Domains",   "Vegetation Types",         
+                      "has as a synonym",          "Is a synonym",             
+                      "Vernacular name" ,          "Bibliographic",            
+                      "Authorship",                "Last Update",              
+                      "User's Last Updated" ,      "How To Cite")
+  } else{
+    
+  }
+  ##manipulating dataframe
   plants_bra <- df %>% fill(Family, Genus) %>% 
     drop_na(Species) %>% 
     unite("taxon_name",
@@ -24,6 +45,7 @@ complete_df <- function(df){
   
   return(plants_bra)
 }
+
 
 
 
