@@ -1,0 +1,5 @@
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
+Boopis jurgensii,Calyceraceae,Boopis,jurgensii,Pilg.,tax_nov,spec.,"Notizbl. Bot. Gart. Berlin-Dahlem 11(102): 101. 1931 , as 'jürgensii'",Notizbl. Bot. Gart. Berlin-Dahlem,1931,11(102): 101,1019-2,NA,NA,NA,NA,"Rio Grande do Sul (Brazil, Southern America)",NA,34822-2,NA,NA,www.ipni.org/n/34822-2,IPNI
+Acicarpha juergensii,Calyceraceae,Acicarpha,juergensii,(Pilg.) S.Denham & Pozner,NA,Species,Taxon 70: 604 (2021),NA,2021,NA,NA,NA,NA,NA,NA,NA,NA,77219569-1,NA,NA,https://powo.science.kew.org/taxon/77219569-1,POWO
+Acicarpha itatiaiae,Calyceraceae,Acicarpha,itatiaiae,(Dusén) S.Denham & Pozner,NA,Species,Taxon 70: 604 (2021),NA,2021,NA,NA,NA,NA,NA,NA,NA,NA,77219568-1,NA,NA,https://powo.science.kew.org/taxon/77219568-1,POWO
+Acicarpha bupleuroides,Calyceraceae,Acicarpha,bupleuroides,Less.,NA,Species,Linnaea 6: 527 (1831),NA,1831,NA,NA,NA,NA,NA,NA,NA,NA,139263-1,NA,NA,https://powo.science.kew.org/taxon/139263-1,POWO

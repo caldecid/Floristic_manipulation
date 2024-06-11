@@ -61,7 +61,7 @@ missing_FFB_function <- function(df){
                                       distribution = "Brazil"),
                                  limit = 1000,
                                  filters = c("species")))
-     ipni_df
+     
     }, error = function(e){
       message("Absent family in IPNI")
       print(e)
@@ -75,14 +75,22 @@ missing_FFB_function <- function(df){
                                                "-", "")
     
     ##IPNI species with hifen absent in FB
-    ipni_abs <- ipni_abs[-which(ipni_abs$hifen_name %in% plants_bra$taxon_name), ]
+    if(sum(ipni_abs$hifen_name %in% plants_bra$taxon_name) != 0){
+      ipni_abs <- ipni_abs[-which(ipni_abs$hifen_name %in% plants_bra$taxon_name), ]
+    } else {
+      ipni_abs
+    }
     
     ##removing column
     ipni_abs <- ipni_abs %>% dplyr::select(-hifen_name)
-   
+    
+    
     ##if else statement for not saving empty dfs
     if(dim(ipni_abs)[1] == 0){
       print("No absent species in Flora de Brasil")
+      
+      list_fam_IPNI[[i]] = NULL
+      
     } else{
       
       ##inserting a df inside each list with the missing species in the Flora Brazil  
@@ -96,17 +104,15 @@ missing_FFB_function <- function(df){
 #####collapsing the list in a df
   df_ipni_families <- do.call("rbind.fill", list_fam_IPNI) %>% 
            dplyr::select(tidyselect::any_of(c("name", "family", "genus", "species",
-                    "authors", "citationType",
-                    "rank", "hybrid", "reference",
+                    "authors", "citationType", "hybrid",
+                    "rank", "reference",
                     "publication", "publicationYear",
                     "referenceCollation",
-                    "publicationId", "suppressed",
+                    "publicationId",
                     "typeLocations", "collectorTeam",
                     "collectionNumber", "collectionDate1",
                     "distribution", "locality", "id",
-                    "fqld", "inPowo", "wfold", "bhlLink",
-                    "publicationYearNote", "remarks",
-                    "referenceRemarks")))%>% 
+                    "publicationYearNote", "remarks")))%>% 
     dplyr::mutate(url = paste0("www.ipni.org/n/", id))
   ##working with the columns
   df_ipni_families$citationType <- "tax_nov"
@@ -142,15 +148,25 @@ missing_FFB_function <- function(df){
     powo_abs$hifen_name = stringr::str_replace(powo_abs$name, 
                                                "-", "")
     
-    ##powo species with hifen absent in FB
-    powo_abs <- powo_abs[-which(powo_abs$hifen_name %in% plants_bra$taxon_name), ]
+    ##Powo species with hifen absent in FB
+    if(sum(powo_abs$hifen_name %in% plants_bra$taxon_name) != 0){
+      
+      powo_abs <- powo_abs[-which(powo_abs$hifen_name %in% plants_bra$taxon_name), ]
+      
+    } else {
+      powo_abs
+    }
     
     ##removing column
     powo_abs <- powo_abs %>% dplyr::select(-hifen_name)
     
+    
     ##if else statement for not saving empty dfs
     if(dim(powo_abs)[1] == 0){
       print("No absent species in Flora de Brasil")
+      
+      list_fam_POWO[[i]] = NULL
+      
     } else{
       powo_abs[,c('genus', 'species')] = stringr::str_split_fixed(powo_abs$name, ' ', 2) 
       
@@ -174,9 +190,60 @@ rownames(df_powo_families) <- NULL
 ##Source
 df_powo_families$source <- "POWO"
 
-##merging dataframes, not repeating species from both repositories
-df_missing_flora <- plyr::rbind.fill(df_ipni_families,
-          df_powo_families[!df_powo_families$name %in% df_ipni_families$name,])
+##id
+df_powo_families$id <- gsub("[^0-9-]", "", df_powo_families$fqId)
+
+##url
+df_powo_families$url <- paste0("https://powo.science.kew.org/taxon/",
+                           df_powo_families$id)
+
+##removing species that appear both in IPNI and POWO
+df_powo_families <- df_powo_families[!df_powo_families$name %in% df_ipni_families$name,]
+
+##generating reference and publicationYear for merging
+df_powo_families$reference <- NA
+
+df_powo_families$publicationYear <- NA
+
+df_powo_families$hybrid <- NA
+
+##loop for generating the reference and publicationYear from lookup_powo
+for(i in 1:nrow(df_powo_families)) {
+  
+  ##temporal dataset
+  tem_df <- tidy(lookup_powo(df_powo_families$id[i]))
+  
+  #if else statements due some powo df dont have this info
+  if(is.null(tem_df$reference)){
+    df_powo_families$reference[i] = NA
+  }else {
+    df_powo_families$reference[i] <- tem_df$reference
+  }
+  if(is.null(tem_df$namePublishedInYear)){
+    df_powo_families$publicationYear[i] = NA
+  }else {
+    df_powo_families$publicationYear[i] <- tem_df$namePublishedInYear
+  }
+  if(is.null(tem_df$hybrid)){
+    df_powo_families$hybrid[i] = NA
+  }else {
+    df_powo_families$hybrid[i] <- tem_df$hybrid
+  }
+  
+}
+
+df_powo_families <- df_powo_families %>%
+                select(any_of(c("name", "family", "genus", "species",
+                               "authors", "rank", "reference", "hybrid",
+                               "publicationYear", "id", "url", "source")))
+##merging dataframes
+df_missing_flora <- plyr::rbind.fill(df_ipni_families, df_powo_families)
+
+##removing hybrid species
+df_missing_flora <- df_missing_flora %>% dplyr::filter(hybrid == "FALSE")
+
+##removing hybrid column
+df_missing_flora <- df_missing_flora %>% dplyr::select(-hybrid)
 
 return(df_missing_flora)
 

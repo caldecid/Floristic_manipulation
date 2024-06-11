@@ -1,0 +1,5 @@
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
+Berberis sellowiana,Berberidaceae,Berberis,sellowiana,C.K.Schneid.,tax_nov,spec.,"Bull. Herb. Boissier ser. 2, 5: 801. 1905 ",Bull. Herb. Boissier,1905,"ser. 2, 5: 801",573-2,NA,NA,NA,NA,Brazil (Southern America),NA,31545-2,NA,NA,www.ipni.org/n/31545-2,IPNI
+Berberis cordiformis,Berberidaceae,Berberis,cordiformis,W.Bull,NA,Species,"Gard. Chron., n.s., 1: 532 (1874)",NA,1874,NA,NA,NA,NA,NA,NA,NA,NA,77221859-1,NA,NA,https://powo.science.kew.org/taxon/77221859-1,POWO
+Berberis claussenii,Berberidaceae,Berberis,claussenii,Citerne,NA,Species,Berberidees Erythrospermees: 152 (1892),NA,1892,NA,NA,NA,NA,NA,NA,NA,NA,77221669-1,NA,NA,https://powo.science.kew.org/taxon/77221669-1,POWO
+Berberis coriacea,Berberidaceae,Berberis,coriacea,A.St.-Hil.,NA,Species,Fl. Bras. Merid. 1: 46 (1825),NA,1825,NA,NA,NA,NA,NA,NA,NA,NA,106561-1,NA,NA,https://powo.science.kew.org/taxon/106561-1,POWO
