@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Ochthocosmus berryi,Ixonanthaceae,Ochthocosmus,berryi,Steyerm.,NA,Species,Ann. Missouri Bot. Gard. 71: 313 (1984),NA,1984,NA,NA,NA,NA,NA,NA,NA,NA,281454-2,NA,NA,https://powo.science.kew.org/taxon/281454-2,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Ochthocosmus berryi,Ixonanthaceae,Ochthocosmus,berryi,Steyerm.,NA,Species,Ann. Missouri Bot. Gard. 71: 313 (1984),NA,1984,NA,NA,NA,NA,NA,NA,NA,NA,281454-2,NA,NA,NA,https://powo.science.kew.org/taxon/281454-2,POWO,NA

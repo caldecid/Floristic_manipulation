@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Piranhea trifoliolata,Picrodendraceae,Piranhea,trifoliolata,Baill.,NA,Species,Adansonia 6: 236 (1866),NA,1866,NA,NA,NA,NA,NA,NA,NA,NA,354926-1,NA,NA,https://powo.science.kew.org/taxon/354926-1,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Piranhea trifoliolata,Picrodendraceae,Piranhea,trifoliolata,Baill.,NA,Species,Adansonia 6: 236 (1866),NA,1866,NA,NA,NA,NA,NA,NA,NA,NA,354926-1,NA,NA,NA,https://powo.science.kew.org/taxon/354926-1,POWO,NA

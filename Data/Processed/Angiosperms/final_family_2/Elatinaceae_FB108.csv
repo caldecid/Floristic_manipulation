@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Elatine glaziovii,Elatinaceae,Elatine,glaziovii,Nied.,NA,Species,"H.G.A.Engler, Nat. Pflanzenfam., ed. 2. 21: 276 (1925)",NA,1925,NA,NA,NA,NA,NA,NA,NA,NA,89510-2,NA,NA,https://powo.science.kew.org/taxon/89510-2,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Elatine glaziovii,Elatinaceae,Elatine,glaziovii,Nied.,NA,Species,"H.G.A.Engler, Nat. Pflanzenfam., ed. 2. 21: 276 (1925)",NA,1925,NA,NA,NA,NA,NA,NA,NA,NA,89510-2,NA,NA,NA,https://powo.science.kew.org/taxon/89510-2,POWO,NA

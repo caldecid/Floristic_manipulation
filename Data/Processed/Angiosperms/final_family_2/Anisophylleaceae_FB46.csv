@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Anisophyllea guianensis,Anisophylleaceae,Anisophyllea,guianensis,Sandwith,NA,Species,Kew Bull. 7: 305 (1952),NA,1952,NA,NA,NA,NA,NA,NA,NA,NA,14077-2,NA,NA,https://powo.science.kew.org/taxon/14077-2,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Anisophyllea guianensis,Anisophylleaceae,Anisophyllea,guianensis,Sandwith,NA,Species,Kew Bull. 7: 305 (1952),NA,1952,NA,NA,NA,NA,NA,NA,NA,NA,14077-2,NA,NA,NA,https://powo.science.kew.org/taxon/14077-2,POWO,NA

@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Drosera lutescens,Droseraceae,Drosera,lutescens,"(A.St.-Hil.) Gonella, Rivadavia & A.Fleischm.",NA,Species,Phytotaxa 553: 49 (2022),NA,2022,NA,NA,NA,NA,NA,NA,NA,NA,77301133-1,NA,NA,https://powo.science.kew.org/taxon/77301133-1,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Drosera lutescens,Droseraceae,Drosera,lutescens,"(A.St.-Hil.) Gonella, Rivadavia & A.Fleischm.",NA,Species,Phytotaxa 553: 49 (2022),NA,2022,NA,NA,NA,NA,NA,NA,NA,NA,77301133-1,NA,NA,NA,https://powo.science.kew.org/taxon/77301133-1,POWO,NA

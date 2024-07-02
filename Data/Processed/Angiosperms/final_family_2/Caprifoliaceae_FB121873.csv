@@ -1,3 +1,3 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Valeriana kurtziana,Caprifoliaceae,Valeriana,kurtziana,Borsini,NA,Species,Lilloa 31: 145 (1962),NA,1962,NA,NA,NA,NA,NA,NA,NA,NA,262250-2,NA,NA,https://powo.science.kew.org/taxon/262250-2,POWO
-Scabiosa atropurpurea,Caprifoliaceae,Scabiosa,atropurpurea,L.,NA,Species,Sp. Pl.: 100 (1753),NA,1753,NA,NA,NA,NA,NA,NA,NA,NA,319717-1,NA,NA,https://powo.science.kew.org/taxon/319717-1,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Valeriana kurtziana,Caprifoliaceae,Valeriana,kurtziana,Borsini,NA,Species,Lilloa 31: 145 (1962),NA,1962,NA,NA,NA,NA,NA,NA,NA,NA,262250-2,NA,NA,NA,https://powo.science.kew.org/taxon/262250-2,POWO,NA
+Scabiosa atropurpurea,Caprifoliaceae,Scabiosa,atropurpurea,L.,NA,Species,Sp. Pl.: 100 (1753),NA,1753,NA,NA,NA,NA,NA,NA,NA,NA,319717-1,NA,NA,NA,https://powo.science.kew.org/taxon/319717-1,POWO,NA

@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Rhabdodendron gardnerianum,Rhabdodendraceae,Rhabdodendron,gardnerianum,(Benth.) Sandwith,NA,Species,J. Arnold Arbor. 24: 224 (1943),NA,1943,NA,NA,NA,NA,NA,NA,NA,NA,218865-2,NA,NA,https://powo.science.kew.org/taxon/218865-2,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Rhabdodendron gardnerianum,Rhabdodendraceae,Rhabdodendron,gardnerianum,(Benth.) Sandwith,NA,Species,J. Arnold Arbor. 24: 224 (1943),NA,1943,NA,NA,NA,NA,NA,NA,NA,NA,218865-2,NA,NA,NA,https://powo.science.kew.org/taxon/218865-2,POWO,NA

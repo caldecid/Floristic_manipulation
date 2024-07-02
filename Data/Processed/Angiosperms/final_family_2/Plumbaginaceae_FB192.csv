@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Plumbago zeylanica,Plumbaginaceae,Plumbago,zeylanica,L.,NA,Species,Sp. Pl.: 151 (1753),NA,1753,NA,NA,NA,NA,NA,NA,NA,NA,687109-1,NA,NA,https://powo.science.kew.org/taxon/687109-1,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Plumbago zeylanica,Plumbaginaceae,Plumbago,zeylanica,L.,NA,Species,Sp. Pl.: 151 (1753),NA,1753,NA,NA,NA,NA,NA,NA,NA,NA,687109-1,NA,NA,NA,https://powo.science.kew.org/taxon/687109-1,POWO,NA

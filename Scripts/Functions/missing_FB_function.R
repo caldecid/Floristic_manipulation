@@ -105,18 +105,26 @@ missing_FFB_function <- function(df){
   df_ipni_families <- do.call("rbind.fill", list_fam_IPNI) %>% 
            dplyr::select(tidyselect::any_of(c("name", "family", "genus", "species",
                     "authors", "citationType", "hybrid",
-                    "rank", "reference",
+                    "rank", "reference", 
                     "publication", "publicationYear",
                     "referenceCollation",
                     "publicationId",
                     "typeLocations", "collectorTeam",
                     "collectionNumber", "collectionDate1",
-                    "distribution", "locality", "id",
+                    "distribution", "locality", "id", "bhlLink",
                     "publicationYearNote", "remarks")))%>% 
     dplyr::mutate(url = paste0("www.ipni.org/n/", id))
   ##working with the columns
   df_ipni_families$citationType <- "tax_nov"
   df_ipni_families$source <- "IPNI"
+  
+  ##obtaining the doi
+  df_ipni_families$doi <- ifelse(str_detect(df_ipni_families$remarks,
+                                            "doi:[^\\s]+"), 
+                            paste0("https://doi.org/",
+                                   str_extract(df_ipni_families$remarks,
+                                               "(?<=doi:)[^\\s]+")), NA)
+                               
   
   rownames(df_ipni_families) <- NULL
 

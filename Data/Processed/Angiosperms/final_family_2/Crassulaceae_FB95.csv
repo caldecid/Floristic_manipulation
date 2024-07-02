@@ -1,2 +1,2 @@
-name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,publicationYearNote,remarks,url,source
-Crassula viridis,Crassulaceae,Crassula,viridis,(S.Watson) M.Bywater & Wickens,NA,Species,Kew Bull. 39: 718 (1984),NA,1984,NA,NA,NA,NA,NA,NA,NA,NA,275253-2,NA,NA,https://powo.science.kew.org/taxon/275253-2,POWO
+name,family,genus,species,authors,citationType,rank,reference,publication,publicationYear,referenceCollation,publicationId,typeLocations,collectorTeam,collectionNumber,collectionDate1,distribution,locality,id,bhlLink,publicationYearNote,remarks,url,source,doi
+Crassula viridis,Crassulaceae,Crassula,viridis,(S.Watson) M.Bywater & Wickens,NA,Species,Kew Bull. 39: 718 (1984),NA,1984,NA,NA,NA,NA,NA,NA,NA,NA,275253-2,NA,NA,NA,https://powo.science.kew.org/taxon/275253-2,POWO,NA
